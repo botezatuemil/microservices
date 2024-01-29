@@ -20,6 +20,7 @@
         <module>eureka-server</module>
         <module>clients</module>
         <module>notifications</module>
+        <module>apigw</module>
     </modules>
     <properties>
         <java.version>17</java.version>
