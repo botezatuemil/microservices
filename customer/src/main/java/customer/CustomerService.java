@@ -1,7 +1,9 @@
 package customer;
 
+import amqp.RabbitMQMessageProducer;
 import clients.fraud.FraudCheckResponse;
 import clients.fraud.FraudClient;
+import clients.notification.NotificationRequest;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +15,8 @@ import org.springframework.web.client.RestTemplate;
 
 public class CustomerService {
     private final CustomerRepository customerRepository;
-    private final RestTemplate restTemplate;
     private final FraudClient fraudClient;
+    private final RabbitMQMessageProducer producer;
 
     public void registerCustomer(CustomerRegistrationRequest request) {
 
@@ -31,7 +33,16 @@ public class CustomerService {
             throw new IllegalStateException("fraudster caught");
         }
 
-        // todo: send notification
+        NotificationRequest notificationRequest = new NotificationRequest(
+                customer.getId(),
+                customer.getEmail(),
+                String.format("Hi %s, welcome to my microservice project...", customer.getFirstName()),
+                        "Emil"
+        );
+
+        producer.publish(notificationRequest,
+                "internal.exchange",
+                "internal.notification.routing-key");
 
     }
 }
