@@ -1,0 +1,29 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name:
+      api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: customer
+          uri: lb://CUSTOMER
+          predicates:
+            - Path=/api/v1/customers/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka
+zipkin:
+  base-url: http://zipkin:9411
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+    endpoint: http://zipkin:9411/api/v2/spans
+logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
